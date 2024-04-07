@@ -201,7 +201,10 @@ const web3wallet = await Web3Wallet.init({
     name: 'Demo React Native Wallet',
     description: 'Demo RN Wallet to interface with Dapps',
     url: 'www.walletconnect.com',
-    icons: []
+    icons: ['https://your_wallet_icon.png'],
+    redirect: {
+      native: 'yourwalletscheme://'
+    }
   }
 })
 ```
@@ -811,7 +814,7 @@ To send an approval, pass a Proposer's Public Key along with the map of namespac
 
 As mentioned before, the `SessionProposalEvent` is emitted when a dapp initiates a new session with your wallet. The event object will include the information about the dapp and requested namespaces. The wallet should display a prompt for the user to approve or reject the session.
 
-To approve a session, call `approveSession()` and pass in the `event.id` and your approved namespaces. 
+To approve a session, call `approveSession()` and pass in the `event.id` and your approved namespaces.
 
 - If you decide to use the `registerRequestHandler()` method to register handlers for supported methods, as explained in previous section, you would use the `generatedNamespaces` object in the `approveSession`
 - If you decide to handle session requests by subscribing to the `onSessionRequest` event, you would need to pass your own set of approved namespaces.
@@ -1046,7 +1049,7 @@ sdk.On<SessionProposalEvent>(EngineEvents.SessionProposal, async (sender, @event
 
 The `session_request` event is emitted when the SDK received a request from the peer and it needs the wallet to perform a specific action, such as signing a transaction. The event contains a `topic` and a `request` object, which will vary depending on the action requested.
 
-To respond to the request, you can access the `topic` and `request` object by destructuring them from the event payload. To see a list of possible `request` and `response` objects, refer to the relevant JSON-RPC Methods for [Ethereum](advanced/rpc-reference/ethereum-rpc.md), [Solana](advanced/rpc-reference/solana-rpc.md), [Cosmos](advanced/rpc-reference/cosmos-rpc.md), or [Stellar](advanced/rpc-reference/stellar-rpc.md).
+To respond to the request, you can access the `topic` and `request` object by destructuring them from the event payload. To see a list of possible `request` and `response` objects, refer to the relevant JSON-RPC Methods for [Ethereum](../advanced/multichain/rpc-reference/ethereum-rpc.md), [Solana](../advanced/multichain/rpc-reference/solana-rpc.md), [Cosmos](../advanced/multichain/rpc-reference/cosmos-rpc.md), or [Stellar](../advanced/multichain/rpc-reference/stellar-rpc.md).
 
 As an example, if the dapp requests a `personal_sign` method, you can extract the `params` array from the `request` object. The first item in the array is the hex version of the message to be signed, which can be converted to UTF-8 and assigned to a `message` variable. The second item in `params` is the user's wallet address.
 
@@ -1279,7 +1282,7 @@ The main difference between these 2 ways of handling session requests is that th
 
 The `session_request` event is triggered by a dapp when it needs the wallet to perform a specific action, such as signing a transaction. The event contains a `topic` and a `request` object, which will vary depending on the action requested.
 
-To respond to the request, the wallet can access the `topic` and `request` object by destructuring them from the event payload. To see a list of possible `request` and `response` objects, refer to the relevant JSON-RPC Methods for [Ethereum](../advanced/rpc-reference/ethereum-rpc.md), [Solana](../advanced/rpc-reference/solana-rpc.md), [Cosmos](../advanced/rpc-reference/cosmos-rpc.md), or [Stellar](../advanced/rpc-reference/stellar-rpc.md).
+To respond to the request, the wallet can access the `topic` and `request` object by destructuring them from the event payload. To see a list of possible `request` and `response` objects, refer to the relevant JSON-RPC Methods for [Ethereum](../advanced/multichain/rpc-reference/ethereum-rpc.md), [Solana](../advanced/multichain/rpc-reference/solana-rpc.md), [Cosmos](../advanced/multichain/rpc-reference/cosmos-rpc.md), or [Stellar](../advanced/multichain/rpc-reference/stellar-rpc.md).
 
 As an example, if the dapp requests a `personal_sign` method, the wallet can extract the `params` array from the `request` object. The first item in the array is the hex version of the message to be signed, which can be converted to UTF-8 and assigned to a `message` variable. The second item in `params` is the user's wallet address.
 
@@ -1850,6 +1853,10 @@ val walletDelegate = object : Web3Wallet.WalletDelegate {
         // Triggered when wallet receives the session proposal sent by a Dapp
     }
 
+    fun onSessionAuthenticate(sessionAuthenticate: Wallet.Model.SessionAuthenticate, verifyContext: Wallet.Model.VerifyContext) {
+      // Triggered when wallet receives the session authenticate sent by a Dapp
+    }
+
     override fun onSessionRequest(sessionRequest: Wallet.Model.SessionRequest, verifyContext: Wallet.Model.VerifyContext) {
         // Triggered when a Dapp sends SessionRequest to sign a transaction or a message
     }
@@ -1967,6 +1974,7 @@ await web3wallet.emitSessionEvent(
 ```
 
 For a better understanding please check out the [example wallet](https://github.com/WalletConnect/WalletConnectFlutterV2/blob/master/example/wallet/lib/) and, in particular, the [EVMService](https://github.com/WalletConnect/WalletConnectFlutterV2/blob/master/example/wallet/lib/dependencies/chains/evm_service.dart) inside of it.
+
 </PlatformTabItem>
 
 <PlatformTabItem value="react-native">
